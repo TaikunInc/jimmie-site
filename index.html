@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jimmie — The AI concierge powered by people with taste</title>
+  <meta name="description" content="Text Jimmie for restaurant, bar, and dining recommendations from people with exceptional taste. New York, London, Paris.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream: #F5F0EB;
+      --ink: #1A1714;
+      --warm: #2C2722;
+      --gold: #B8976A;
+      --gold-light: #D4BC96;
+      --stone: #8C8279;
+      --blush: #E8DDD4;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      background: var(--cream);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+
+    /* ── Grain overlay ─────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    /* ── Hero ───────────────────────────────────────── */
+    .hero {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem 1.5rem;
+      text-align: center;
+      position: relative;
+    }
+
+    .hero-content {
+      max-width: 560px;
+      opacity: 0;
+      animation: fadeUp 1s ease-out 0.2s forwards;
+    }
+
+    .logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(4rem, 12vw, 7.5rem);
+      letter-spacing: -0.02em;
+      line-height: 0.9;
+      color: var(--ink);
+      margin-bottom: 1.5rem;
+    }
+
+    .tagline {
+      font-family: 'DM Sans', sans-serif;
+      font-size: clamp(0.8rem, 2.2vw, 0.95rem);
+      font-weight: 400;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--stone);
+      margin-bottom: 3.5rem;
+    }
+
+    .divider {
+      width: 40px;
+      height: 1px;
+      background: var(--gold);
+      margin: 0 auto 3.5rem;
+      opacity: 0;
+      animation: fadeIn 0.8s ease-out 0.6s forwards;
+    }
+
+    .intro {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.3rem, 3.5vw, 1.65rem);
+      font-weight: 300;
+      line-height: 1.55;
+      color: var(--warm);
+      margin-bottom: 3rem;
+      font-style: italic;
+      opacity: 0;
+      animation: fadeUp 1s ease-out 0.8s forwards;
+    }
+
+    .cta-group {
+      opacity: 0;
+      animation: fadeUp 1s ease-out 1s forwards;
+    }
+
+    .cta-label {
+      font-size: 0.75rem;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--stone);
+      margin-bottom: 1rem;
+    }
+
+    .phone-number {
+      display: inline-block;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.6rem, 5vw, 2.2rem);
+      font-weight: 500;
+      color: var(--ink);
+      text-decoration: none;
+      padding: 0.6rem 0;
+      position: relative;
+      transition: color 0.3s ease;
+    }
+
+    .phone-number::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--gold);
+      transform: scaleX(0.4);
+      transition: transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+
+    .phone-number:hover {
+      color: var(--gold);
+    }
+
+    .phone-number:hover::after {
+      transform: scaleX(1);
+    }
+
+    .sms-link {
+      display: inline-block;
+      margin-top: 1.5rem;
+      font-size: 0.85rem;
+      font-weight: 400;
+      color: var(--cream);
+      background: var(--ink);
+      text-decoration: none;
+      padding: 0.9rem 2.5rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: all 0.35s ease;
+    }
+
+    .sms-link:hover {
+      background: var(--warm);
+      transform: translateY(-1px);
+    }
+
+    /* ── About section ─────────────────────────────── */
+    .about {
+      padding: 6rem 1.5rem 8rem;
+      max-width: 620px;
+      margin: 0 auto;
+    }
+
+    .about-header {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 2.5rem;
+    }
+
+    .about p {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.15rem, 3vw, 1.35rem);
+      font-weight: 400;
+      line-height: 1.7;
+      color: var(--warm);
+      margin-bottom: 1.8rem;
+    }
+
+    .about p:last-of-type {
+      margin-bottom: 0;
+    }
+
+    .about em {
+      font-style: italic;
+      color: var(--ink);
+    }
+
+    /* ── How it works ──────────────────────────────── */
+    .how-it-works {
+      background: var(--ink);
+      padding: 6rem 1.5rem;
+      text-align: center;
+    }
+
+    .how-it-works-inner {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .how-header {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 3rem;
+    }
+
+    .step {
+      margin-bottom: 2.5rem;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .step.visible {
+      opacity: 1;
+      transform: translateY(0);
+      transition: all 0.6s ease-out;
+    }
+
+    .step-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.2rem, 3.5vw, 1.5rem);
+      font-weight: 300;
+      line-height: 1.5;
+      color: var(--blush);
+    }
+
+    .step-text strong {
+      color: var(--gold-light);
+      font-weight: 500;
+    }
+
+    .step-divider {
+      width: 20px;
+      height: 1px;
+      background: var(--stone);
+      margin: 0 auto;
+      opacity: 0.4;
+    }
+
+    /* ── Sample conversation ───────────────────────── */
+    .sample {
+      padding: 6rem 1.5rem;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .sample-header {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 2.5rem;
+      text-align: center;
+    }
+
+    .chat {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .bubble {
+      max-width: 85%;
+      padding: 0.9rem 1.15rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 300;
+      line-height: 1.55;
+      border-radius: 18px;
+      opacity: 0;
+      transform: translateY(12px);
+    }
+
+    .bubble.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .bubble.user {
+      align-self: flex-end;
+      background: var(--ink);
+      color: var(--cream);
+      border-bottom-right-radius: 4px;
+      transition: all 0.4s ease-out;
+    }
+
+    .bubble.jimmie {
+      align-self: flex-start;
+      background: var(--blush);
+      color: var(--warm);
+      border-bottom-left-radius: 4px;
+      transition: all 0.4s ease-out;
+    }
+
+    .bubble .sender {
+      font-size: 0.7rem;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.5;
+      margin-bottom: 0.3rem;
+    }
+
+    /* ── Cities ─────────────────────────────────────── */
+    .cities {
+      padding: 4rem 1.5rem 6rem;
+      text-align: center;
+    }
+
+    .cities-header {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--stone);
+      margin-bottom: 2rem;
+    }
+
+    .city-list {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.8rem, 5vw, 2.5rem);
+      font-weight: 300;
+      color: var(--ink);
+      line-height: 1.6;
+    }
+
+    .city-list .active {
+      color: var(--ink);
+    }
+
+    .city-list .coming {
+      color: var(--stone);
+      font-style: italic;
+    }
+
+    .city-separator {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      background: var(--gold);
+      border-radius: 50%;
+      vertical-align: middle;
+      margin: 0 1rem;
+    }
+
+    /* ── Footer CTA ────────────────────────────────── */
+    .footer-cta {
+      padding: 5rem 1.5rem;
+      text-align: center;
+      border-top: 1px solid var(--blush);
+    }
+
+    .footer-cta .intro {
+      margin-bottom: 2rem;
+      opacity: 1;
+      animation: none;
+    }
+
+    .footer-cta .cta-group {
+      opacity: 1;
+      animation: none;
+    }
+
+    /* ── Footer ─────────────────────────────────────── */
+    footer {
+      padding: 2rem 1.5rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--stone);
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Animations ─────────────────────────────────── */
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* ── Scroll reveal utility ─────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: all 0.7s ease-out;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── Responsive ─────────────────────────────────── */
+    @media (max-width: 480px) {
+      .hero {
+        padding: 2rem 1.25rem;
+      }
+
+      .about {
+        padding: 4rem 1.25rem 5rem;
+      }
+
+      .bubble {
+        max-width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── Hero ──────────────────────────────────── -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1 class="logo">Jimmie</h1>
+      <p class="tagline">Powered by people with taste</p>
+      <div class="divider"></div>
+      <p class="intro">
+        The restaurants, bars, and hidden spots that the right people know about — delivered by text, from someone who's actually been.
+      </p>
+      <div class="cta-group">
+        <p class="cta-label">Text Jimmie</p>
+        <a href="tel:+1XXXXXXXXXX" class="phone-number">+1 (XXX) XXX-XXXX</a>
+        <br>
+        <a href="sms:+1XXXXXXXXXX&body=Hey%20Jimmie" class="sms-link">Send a text</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── About ─────────────────────────────────── -->
+  <section class="about">
+    <p class="about-header reveal">The idea</p>
+    <p class="reveal">
+      Jimmie is the concierge at the best hotel you've ever stayed at — except you don't need a room. Just his number.
+    </p>
+    <p class="reveal">
+      Text him where you are and what you're in the mood for. He'll tell you exactly where to go, what to order, and where to sit. No lists, no reviews, no "top 10" nonsense. Just <em>the move</em>.
+    </p>
+    <p class="reveal">
+      Every recommendation comes from real people with exceptional taste — not algorithms, not sponsored content, not scraped reviews. Places they've been to, dishes they've ordered, seats they've sat in.
+    </p>
+  </section>
+
+  <!-- ─── How It Works ──────────────────────────── -->
+  <section class="how-it-works">
+    <div class="how-it-works-inner">
+      <p class="how-header">How it works</p>
+
+      <div class="step" data-delay="0">
+        <p class="step-text"><strong>Text Jimmie</strong> like you'd text a friend. "Where should I eat tonight in Soho?"</p>
+      </div>
+      <div class="step-divider"></div>
+
+      <div class="step" data-delay="150">
+        <p class="step-text">He <strong>texts you back</strong> with a confident, specific recommendation — what to order, where to sit, the whole thing.</p>
+      </div>
+      <div class="step-divider"></div>
+
+      <div class="step" data-delay="300">
+        <p class="step-text">If he nails it, you <strong>tip him</strong>. Just like a real concierge.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Sample Conversation ───────────────────── -->
+  <section class="sample">
+    <p class="sample-header">A taste</p>
+    <div class="chat">
+      <div class="bubble user" data-delay="0">
+        <p>My girlfriend and I want a great dinner in Chelsea tonight. Something fun, not too stuffy.</p>
+      </div>
+      <div class="bubble jimmie" data-delay="300">
+        <p>Shukette. Modern Middle Eastern, everything is meant to be shared, and the food is genuinely incredible. Get the Frena bread — order two, trust me — and sit at the open kitchen counter if you can. Watching the grill is half the experience. Make a res if you can but you might walk in lucky.</p>
+      </div>
+      <div class="bubble user" data-delay="600">
+        <p>That sounds perfect. What about drinks after?</p>
+      </div>
+      <div class="bubble jimmie" data-delay="900">
+        <p>I'm still building out my bar list in Chelsea, so I'm not going to send you somewhere I can't vouch for. But if you're open to a short walk, I've got a spot. Give me your vibe — low-key or more of a scene?</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Cities ────────────────────────────────── -->
+  <section class="cities reveal">
+    <p class="cities-header">Currently covering</p>
+    <p class="city-list">
+      <span class="active">New York</span>
+      <span class="city-separator"></span>
+      <span class="coming">London</span>
+      <span class="city-separator"></span>
+      <span class="coming">Paris</span>
+    </p>
+  </section>
+
+  <!-- ─── Footer CTA ───────────────────────────── -->
+  <section class="footer-cta">
+    <p class="intro" style="font-size: clamp(1.15rem, 3vw, 1.4rem); margin-bottom: 2rem;">
+      Next time you're wondering where to go,<br>you've got a guy.
+    </p>
+    <div class="cta-group">
+      <a href="sms:+1XXXXXXXXXX&body=Hey%20Jimmie" class="sms-link">Text Jimmie</a>
+    </div>
+  </section>
+
+  <footer>
+    <p>jimmie.ai &middot; 2026</p>
+  </footer>
+
+  <script>
+    // ── Scroll reveal ──────────────────────────────
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const delay = entry.target.dataset.delay || 0;
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, parseInt(delay));
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.15,
+      rootMargin: '0px 0px -40px 0px'
+    });
+
+    document.querySelectorAll('.reveal, .step, .bubble').forEach(el => {
+      observer.observe(el);
+    });
+  </script>
+
+</body>
+</html>
